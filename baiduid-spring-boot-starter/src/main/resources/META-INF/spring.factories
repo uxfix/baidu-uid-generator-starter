@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.dekux.uid.config.BaiduidAutoConfiguration
+org.springframework.context.ApplicationListener=\
+com.dekux.uid.config.RegisterPackageListener

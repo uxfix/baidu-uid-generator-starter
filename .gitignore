@@ -1,0 +1,13 @@
+/*.iml
+/*.ipr
+/*.iws
+/.idea
+/.settings
+/.project
+target
+.mvn/wrapper/maven-wrapper.jar
+pom.xml.releaseBackup
+release.properties
+### Mac
+.DS_Store
+*/.DS_Store
