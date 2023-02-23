@@ -9,8 +9,8 @@
     <packaging>pom</packaging>
     <version>1.0</version>
     <modules>
-        <module>baiduid-spring-boot-starter</module>
         <module>uid-generator-example</module>
+        <module>baiduid-spring-boot-starter</module>
     </modules>
 
     <properties>
