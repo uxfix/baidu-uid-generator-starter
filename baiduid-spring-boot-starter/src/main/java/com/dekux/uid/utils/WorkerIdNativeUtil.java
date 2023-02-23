@@ -5,10 +5,11 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.*;
 
 /**
- * @desc: WorkerIdNativeUtil
- * @author: Yuan
- * @create: 2023/2/23
- **/
+ * 保持 WorkerId 到本地
+ *
+ * @author yuan
+ * @since 1.0
+ */
 public abstract class WorkerIdNativeUtil {
 
     private final static String CLASS_PATH = "id/worker_id.txt";
