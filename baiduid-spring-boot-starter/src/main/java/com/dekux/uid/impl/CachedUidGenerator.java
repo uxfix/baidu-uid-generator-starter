@@ -33,33 +33,37 @@ import java.util.List;
 /**
  * Represents a cached implementation of {@link UidGenerator} extends
  * from {@link DefaultUidGenerator}, based on a lock free {@link RingBuffer}<p>
- * 
+ * <p>
  * The spring properties you can specified as below:<br>
- * <li><b>boostPower:</b> RingBuffer size boost for a power of 2, Sample: boostPower is 3, it means the buffer size 
- *                        will be <code>({@link BitsAllocator#getMaxSequence()} + 1) &lt;&lt;
- *                        {@link #boostPower}</code>, Default as {@value #DEFAULT_BOOST_POWER}
- * <li><b>paddingFactor:</b> Represents a percent value of (0 - 100). When the count of rest available UIDs reach the 
- *                           threshold, it will trigger padding buffer. Default as{@link RingBuffer#DEFAULT_PADDING_PERCENT}
- *                           Sample: paddingFactor=20, bufferSize=1000 -> threshold=1000 * 20 /100, padding buffer will be triggered when tail-cursor<threshold
+ * <li><b>boostPower:</b> RingBuffer size boost for a power of 2, Sample: boostPower is 3, it means the buffer size
+ * will be <code>({@link BitsAllocator#getMaxSequence()} + 1) &lt;&lt;
+ * {@link #boostPower}</code>, Default as {@value #DEFAULT_BOOST_POWER}
+ * <li><b>paddingFactor:</b> Represents a percent value of (0 - 100). When the count of rest available UIDs reach the
+ * threshold, it will trigger padding buffer. Default as{@link RingBuffer#DEFAULT_PADDING_PERCENT}
+ * Sample: paddingFactor=20, bufferSize=1000 -> threshold=1000 * 20 /100, padding buffer will be triggered when tail-cursor<threshold
  * <li><b>scheduleInterval:</b> Padding buffer in a schedule, specify padding buffer interval, Unit as second
  * <li><b>rejectedPutBufferHandler:</b> Policy for rejected put buffer. Default as discard put request, just do logging
  * <li><b>rejectedTakeBufferHandler:</b> Policy for rejected take buffer. Default as throwing up an exception
- * 
+ *
  * @author yutianbao
  */
 public class CachedUidGenerator extends DefaultUidGenerator implements DisposableBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(CachedUidGenerator.class);
     private static final int DEFAULT_BOOST_POWER = 3;
 
-    /** Spring properties */
+    /**
+     * Spring properties
+     */
     private int boostPower = DEFAULT_BOOST_POWER;
     private int paddingFactor = RingBuffer.DEFAULT_PADDING_PERCENT;
     private Long scheduleInterval;
-    
+
     private RejectedPutBufferHandler rejectedPutBufferHandler;
     private RejectedTakeBufferHandler rejectedTakeBufferHandler;
 
-    /** RingBuffer */
+    /**
+     * RingBuffer
+     */
     private RingBuffer ringBuffer;
     private BufferPaddingExecutor bufferPaddingExecutor;
 
@@ -67,12 +71,12 @@ public class CachedUidGenerator extends DefaultUidGenerator implements Disposabl
     public void afterPropertiesSet() throws Exception {
         // initialize workerId & bitsAllocator
         super.afterPropertiesSet();
-        
+
         // initialize RingBuffer & RingBufferPaddingExecutor
         this.initRingBuffer();
         LOGGER.info("Initialized RingBuffer successfully.");
     }
-    
+
     @Override
     public long getUID() {
         try {
@@ -87,7 +91,7 @@ public class CachedUidGenerator extends DefaultUidGenerator implements Disposabl
     public String parseUID(long uid) {
         return super.parseUID(uid);
     }
-    
+
     @Override
     public void destroy() throws Exception {
         bufferPaddingExecutor.shutdown();
@@ -95,7 +99,7 @@ public class CachedUidGenerator extends DefaultUidGenerator implements Disposabl
 
     /**
      * Get the UIDs in the same specified second under the max sequence
-     * 
+     *
      * @param currentSecond
      * @return UID list, size of {@link BitsAllocator#getMaxSequence()} + 1
      */
@@ -112,7 +116,7 @@ public class CachedUidGenerator extends DefaultUidGenerator implements Disposabl
 
         return uidList;
     }
-    
+
     /**
      * Initialize RingBuffer & RingBufferPaddingExecutor
      */
@@ -128,9 +132,9 @@ public class CachedUidGenerator extends DefaultUidGenerator implements Disposabl
         if (usingSchedule) {
             bufferPaddingExecutor.setScheduleInterval(scheduleInterval);
         }
-        
+
         LOGGER.info("Initialized BufferPaddingExecutor. Using schdule:{}, interval:{}", usingSchedule, scheduleInterval);
-        
+
         // set rejected put/take handle policy
         this.ringBuffer.setBufferPaddingExecutor(bufferPaddingExecutor);
         if (rejectedPutBufferHandler != null) {
@@ -139,10 +143,10 @@ public class CachedUidGenerator extends DefaultUidGenerator implements Disposabl
         if (rejectedTakeBufferHandler != null) {
             this.ringBuffer.setRejectedTakeHandler(rejectedTakeBufferHandler);
         }
-        
+
         // fill in all slots of the RingBuffer
         bufferPaddingExecutor.paddingBuffer();
-        
+
         // start buffer padding threads
         bufferPaddingExecutor.start();
     }
@@ -154,7 +158,12 @@ public class CachedUidGenerator extends DefaultUidGenerator implements Disposabl
         Assert.isTrue(boostPower > 0, "Boost power must be positive!");
         this.boostPower = boostPower;
     }
-    
+
+    public void setPaddingFactor(int paddingFactor) {
+        Assert.isTrue(paddingFactor > 0, "Padding Factor must positive!");
+        this.paddingFactor = paddingFactor;
+    }
+
     public void setRejectedPutBufferHandler(RejectedPutBufferHandler rejectedPutBufferHandler) {
         this.rejectedPutBufferHandler = rejectedPutBufferHandler;
     }

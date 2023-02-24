@@ -60,11 +60,16 @@ public class BaiduidAutoConfiguration {
     @ConditionalOnMissingBean
     public UidGenerator cachedUidGenerator() {
         CachedUidGenerator cachedUidGenerator = new CachedUidGenerator();
-        cachedUidGenerator.setEpochStr(baiduidProperties.getEpochStr());
         cachedUidGenerator.setTimeBits(baiduidProperties.getTimeBits());
         cachedUidGenerator.setWorkerBits(baiduidProperties.getWorkerBits());
+        cachedUidGenerator.setSeqBits(baiduidProperties.getSeqBits());
         cachedUidGenerator.setEpochStr(baiduidProperties.getEpochStr());
-        cachedUidGenerator.setEpochStr(baiduidProperties.getEpochStr());
+        cachedUidGenerator.setBoostPower(baiduidProperties.getBoostPower());
+        Long scheduleInterval = baiduidProperties.getScheduleInterval();
+        if (scheduleInterval != null && scheduleInterval > 0) {
+            cachedUidGenerator.setScheduleInterval(scheduleInterval);
+        }
+        cachedUidGenerator.setPaddingFactor(baiduidProperties.getPaddingFactor());
         cachedUidGenerator.setWorkerIdAssigner(workerIdAssigner);
         cachedUidGenerator.setRejectedPutBufferHandler(rejectedPutBufferHandler);
         cachedUidGenerator.setRejectedTakeBufferHandler(rejectedTakeBufferHandler);
@@ -72,7 +77,7 @@ public class BaiduidAutoConfiguration {
     }
 
     @Bean
-    public ReusableWorkerIdAop reusableWorkerIdAop(){
+    public ReusableWorkerIdAop reusableWorkerIdAop() {
         return new ReusableWorkerIdAop(baiduidProperties.isReusable());
     }
 
