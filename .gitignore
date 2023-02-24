@@ -11,3 +11,4 @@ release.properties
 ### Mac
 .DS_Store
 */.DS_Store
+WORKER_ID/*
