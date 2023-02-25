@@ -42,6 +42,30 @@ PRIMARY KEY(ID)
 
 如果你使用的 Spring-Data-Jpa，那么通常不需要自己创建表。
 
+### 注入 UidGenerator
+
+当你完成上面两步后，那么在 Spring 容器内会有一个 `UidGenerator` 类型 Bean 对象，然后在你需要生成 ID 的地方里面注入这个 Bean 对象即可：
+
+```java
+// 使用示例
+@Service
+public class UserService {
+    // 注入 UidGenerator Bean 对象
+    private final UidGenerator uidGenerator;
+
+    public UserService(UidGenerator uidGenerator) {
+        this.uidGenerator = uidGenerator;
+    }
+    
+    public void saveUser(User user){
+        // 生成ID
+        long uid = uidGenerator.getUID();
+        user.setId(uid);
+        // ...
+    }
+}
+```
+
 ## 自定义分配 WorkerId 策略
 
 如果你的项目既不使用 Mybatis 也不是使用 Spring-Data-Jpa，也许你可能需要自定义分配 workerId 策略，比方说你可能想要使用 Redis 来进行 workerId 分配，那么你只需要实现 `WorkerIdAssigner` 接口即可：
