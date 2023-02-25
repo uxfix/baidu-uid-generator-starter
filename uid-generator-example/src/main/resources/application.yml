@@ -9,3 +9,13 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+baiduid:
+  reusable: true #是否可复用 workerId
+  time-bits: 28 #时间比特位数
+  worker-bits: 22 #机器id比特位数
+  seq-bits: 13 #每秒下的并发序列比特位
+  epoch-str: 2023-02-25 #时间基点
+  # 以下三个参数配置仅在使用 CachedUidGenerator 实现时才需要配置
+  boost-power: 3 #RingBuffer size扩容参数
+  schedule-interval: 10 #填充RingBuffer的Schedule线程时间间隔, 单位:秒
+  padding-factor: 50 #指定RingBuffer小于多少百分比数量时进行填充

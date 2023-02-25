@@ -123,13 +123,23 @@ workerId 复用机制的实现原理是借助于 AOP，对 `WorkerIdAssigner#ass
 
 ```yml
 baiduid:
-  reusable: true #是否可复用 workerId  
+  reusable: true #是否可复用 workerId
   time-bits: 28 #时间比特位数
   worker-bits: 22 #机器id比特位数
   seq-bits: 13 #每秒下的并发序列比特位
   epoch-str: 2023-02-25 #时间基点
+  # 以下三个参数配置仅在使用 CachedUidGenerator 实现时才需要配置
   boost-power: 3 #RingBuffer size扩容参数
-  padding-factor: 50 #指定何时向RingBuffer中填充UID
+  schedule-interval: 10 #填充RingBuffer的Schedule线程时间间隔, 单位:秒
+  padding-factor: 50 #指定RingBuffer小于多少百分比数量时进行填充
 ```
 
 以上是一些你可以自定义修改的配置，对这些配置更详细的定义解析，可以参见 `BaiduidProperties` 类，或者去看 `https://github.com/baidu/uid-generator` 原项目的文档说明。
+
+如果你使用的是 `CachedUidGenerator` 实现类，那么你还可以往 Spring 容器注册：
+
+- `RejectedPutBufferHandler`：（当环已满, 无法继续填充时，默认实现为将丢弃Put操作, 仅日志记录）
+- `RejectedTakeBufferHandler`：（当环已空, 无法继续获取时， 默认实现记录日志, 并抛出 UidGenerateException 异常）
+
+来自定义你的拒绝策略。
+
