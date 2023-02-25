@@ -66,6 +66,22 @@ public class UserService {
 }
 ```
 
+默认注册的是一个带缓存的 `CachedUidGenerator`  实现，在内部总共有两种 `UidGenerator` 的实现，另一种是 `DefaultUidGenerator` 不带缓存的实现，如果你想使用 `DefaultUidGenerator` 的实现，那么只需要将这个对象注册成为 Bean 即可：
+
+```java
+@Bean
+public UidGenerator defaultUidGenerator(BaiduidProperties baiduidProperties) {
+    DefaultUidGenerator defaultUidGenerator = new DefaultUidGenerator();
+    defaultUidGenerator.setTimeBits(baiduidProperties.getTimeBits());
+    defaultUidGenerator.setWorkerBits(baiduidProperties.getWorkerBits());
+    defaultUidGenerator.setSeqBits(baiduidProperties.getSeqBits());
+    defaultUidGenerator.setEpochStr(baiduidProperties.getEpochStr());
+    return defaultUidGenerator;
+}
+```
+
+关于这两种实现的区别可见[百度 uid 的文档](https://github.com/baidu/uid-generator/blob/master/README.zh_cn.md#cacheduidgenerator)。
+
 ## 自定义分配 WorkerId 策略
 
 如果你的项目既不使用 Mybatis 也不是使用 Spring-Data-Jpa，也许你可能需要自定义分配 workerId 策略，比方说你可能想要使用 Redis 来进行 workerId 分配，那么你只需要实现 `WorkerIdAssigner` 接口即可：
